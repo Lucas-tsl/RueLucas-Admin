@@ -44,11 +44,10 @@ export default function ReviewModal({ isOpen, onClose, review, onSave }: ReviewM
     
     try {
       await onSave(formData);
-      // Ne pas fermer automatiquement ici - laissé au parent de gérer
+      // Le parent gère la fermeture
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
-    } finally {
-      setLoading(false);
+      setLoading(false); // Arrêter le loading en cas d'erreur
     }
   };
 

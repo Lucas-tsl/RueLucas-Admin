@@ -110,11 +110,15 @@ export default function ReviewsPage() {
 
   const handleSaveReview = async (reviewData: Partial<ReviewForm>) => {
     try {
-      setLoading(true);
       let response;
       
       if (selectedReview) {
         // Modification d'un avis existant
+        console.log('=== MODIFICATION AVIS ===');
+        console.log('Avis original:', selectedReview);
+        console.log('Nouvelles données:', reviewData);
+        console.log('URL:', `https://api-rue-lucas.vercel.app/api/reviews/${selectedReview._id}`);
+        
         response = await fetch(`https://api-rue-lucas.vercel.app/api/reviews/${selectedReview._id}`, {
           method: 'PUT',
           headers: {
@@ -124,6 +128,7 @@ export default function ReviewsPage() {
         });
       } else {
         // Création d'un nouvel avis
+        console.log('Création d\'un nouvel avis:', reviewData);
         response = await fetch('https://api-rue-lucas.vercel.app/api/reviews', {
           method: 'POST',
           headers: {
@@ -133,27 +138,28 @@ export default function ReviewsPage() {
         });
       }
 
+      console.log('Réponse API:', response.status, response.statusText);
+
       if (response.ok) {
-        // Fermer le modal et réinitialiser l'état
+        // Fermer le modal IMMÉDIATEMENT
         setIsModalOpen(false);
         setSelectedReview(undefined);
+        
+        // Afficher le message de succès
+        const message = selectedReview ? 'Avis modifié avec succès !' : 'Avis créé avec succès !';
+        alert(message);
         
         // Recharger les avis
         await fetchReviews();
         
-        // Afficher le message de succès
-        alert(selectedReview ? 'Avis modifié avec succès !' : 'Avis créé avec succès !');
-        
-        // Forcer le rafraîchissement de la page
-        router.refresh();
       } else {
         const errorText = await response.text();
         console.error('Erreur de sauvegarde:', response.status, errorText);
         alert(`Erreur lors de la sauvegarde: ${response.status} - ${errorText}`);
       }
     } catch (error) {
-      console.error('Erreur:', error);
-      alert(`Erreur lors de la sauvegarde: ${error}`);
+      console.error('Erreur réseau:', error);
+      alert(`Erreur réseau lors de la sauvegarde: ${error}`);
     } finally {
       setLoading(false);
     }
