@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   Star, 
   ArrowLeft, 
@@ -17,6 +18,7 @@ import ReviewModal from '../../components/ReviewModal';
 import { ApiReview, PaginatedResponse, ReviewForm } from '../../types';
 
 export default function ReviewsPage() {
+  const router = useRouter();
   const [reviews, setReviews] = useState<ApiReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -132,10 +134,18 @@ export default function ReviewsPage() {
       }
 
       if (response.ok) {
-        await fetchReviews();
+        // Fermer le modal et réinitialiser l'état
         setIsModalOpen(false);
         setSelectedReview(undefined);
+        
+        // Recharger les avis
+        await fetchReviews();
+        
+        // Afficher le message de succès
         alert(selectedReview ? 'Avis modifié avec succès !' : 'Avis créé avec succès !');
+        
+        // Forcer le rafraîchissement de la page
+        router.refresh();
       } else {
         const errorText = await response.text();
         console.error('Erreur de sauvegarde:', response.status, errorText);

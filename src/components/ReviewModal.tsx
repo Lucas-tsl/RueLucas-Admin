@@ -44,7 +44,7 @@ export default function ReviewModal({ isOpen, onClose, review, onSave }: ReviewM
     
     try {
       await onSave(formData);
-      onClose();
+      // Ne pas fermer automatiquement ici - laissé au parent de gérer
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
     } finally {
