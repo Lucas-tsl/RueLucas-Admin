@@ -12,10 +12,13 @@ Dashboard administrateur pour la gestion des réservations et avis de la locatio
 - **Statuts** : Gestion des statuts (En attente, Payée, Annulée)
 
 ### ⭐ Gestion des Avis
-- **Liste complète** : Affichage de tous les avis clients
-- **Statistiques** : Note moyenne et répartition des notes
-- **Recherche** : Filtrage par auteur ou contenu de l'avis
-- **Visualisation** : Affichage avec système d'étoiles et dates
+- **Dashboard complet** : Statistiques détaillées (note moyenne, répartition, total)
+- **Liste interactive** : Affichage de tous les avis avec système d'étoiles
+- **Recherche en temps réel** : Filtrage par auteur ou contenu
+- **Création d'avis** : Modal de création avec validation ✅
+- **Modification** : Interface prête (en attente API) ⚠️
+- **Suppression** : Interface prête (en attente API) ⚠️
+- **Visualisation** : Design responsive avec dates formatées
 
 ## 🚀 Technologies
 
@@ -100,15 +103,30 @@ L'application se connecte à l'API : `https://api-rue-lucas.vercel.app`
 - **UX intuitive** : Navigation claire et actions évidentes
 - **Accessibilité** : Respect des standards d'accessibilité web
 
+## 🚧 État de l'API
+
+### Endpoints disponibles
+- ✅ `GET /api/reviews` - Consultation des avis
+- ✅ `POST /api/reviews` - Création d'avis
+- ✅ `GET /reservations` - Consultation des réservations
+- ✅ `DELETE /reservations/:id` - Suppression de réservations
+
+### En attente de développement
+- ⚠️ `PUT /api/reviews/:id` - Modification d'avis
+- ⚠️ `DELETE /api/reviews/:id` - Suppression d'avis
+- ⚠️ `POST /reservations` - Création de réservations
+- ⚠️ `PUT /reservations/:id` - Modification de réservations
+
+> 📝 **Note :** L'interface est prête pour toutes ces fonctionnalités. Voir `API_ENHANCEMENT_ISSUE.md` pour les spécifications techniques.
+
 ## 🚧 Fonctionnalités à venir
 
-- [ ] Création/modification de réservations
-- [ ] Suppression de réservations
-- [ ] Modération des avis
-- [ ] Authentification admin
-- [ ] Notifications push
-- [ ] Export de données
-- [ ] Tableau de bord avancé
+- [ ] Modération avancée des avis (statuts pending/approved/rejected)
+- [ ] Authentification admin sécurisée
+- [ ] Notifications en temps réel
+- [ ] Export de données (CSV/PDF)
+- [ ] Analytics avancées
+- [ ] Interface de gestion des utilisateurs
 
 ## 📈 Performance
 
