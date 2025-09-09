@@ -148,11 +148,19 @@ export default function ReservationsPage() {
       let response;
       
       if (selectedReservation) {
-        // Modification d'une réservation existante - pas supportée par l'API
-        alert('⚠️ Fonctionnalité non disponible\n\nLa modification des réservations n\'est pas encore implémentée dans l\'API.\nSeules la création et suppression sont disponibles.');
-        setIsModalOpen(false);
-        setSelectedReservation(undefined);
-        return;
+        // Modification d'une réservation existante
+        console.log('=== MODIFICATION RÉSERVATION ===');
+        console.log('Données modifiées:', reservationData);
+        console.log('ID réservation:', selectedReservation._id);
+        console.log('URL PUT:', `https://api-rue-lucas.vercel.app/reservations/${selectedReservation._id}`);
+        
+        response = await fetch(`https://api-rue-lucas.vercel.app/reservations/${selectedReservation._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(reservationData)
+        });
       } else {
         // Création d'une nouvelle réservation - supportée
         console.log('=== CRÉATION RÉSERVATION ===');
@@ -176,7 +184,8 @@ export default function ReservationsPage() {
         setSelectedReservation(undefined);
         
         // Afficher le message de succès
-        alert('Réservation créée avec succès !');
+        const action = selectedReservation ? 'modifiée' : 'créée';
+        alert(`Réservation ${action} avec succès !`);
         
         // Recharger les réservations
         await fetchReservations();
@@ -424,13 +433,10 @@ export default function ReservationsPage() {
                             <Eye className="h-4 w-4" />
                           </button>
                           <button 
-                            onClick={() => {
-                              alert('⚠️ Fonctionnalité non disponible\n\nLa modification des réservations n\'est pas encore implémentée dans l\'API.\nSeules la création et suppression sont disponibles.');
-                            }}
-                            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors cursor-not-allowed"
-                            title="Modifier (non disponible)"
-                            aria-label="Modifier la réservation (non disponible)"
-                            disabled
+                            onClick={() => handleEditReservation(reservation)}
+                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Modifier"
+                            aria-label="Modifier la réservation"
                           >
                             <Edit className="h-4 w-4" />
                           </button>
