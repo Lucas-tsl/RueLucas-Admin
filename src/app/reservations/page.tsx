@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { 
   Calendar, 
   ArrowLeft, 
@@ -13,7 +14,11 @@ import {
   Trash2,
   Plus
 } from 'lucide-react';
-import ReservationModal from '../../components/ReservationModal';
+
+// Import dynamique pour éviter l'hydratation
+const ReservationModal = dynamic(() => import('../../components/ReservationModal'), {
+  ssr: false
+});
 
 interface Reservation {
   _id: string;
@@ -44,6 +49,7 @@ interface ApiResponse {
 
 export default function ReservationsPage() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -54,6 +60,10 @@ export default function ReservationsPage() {
   const [total, setTotal] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | undefined>();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const fetchReservations = useCallback(async () => {
     try {
@@ -229,14 +239,16 @@ export default function ReservationsPage() {
               </h1>
             </div>
             <div className="flex space-x-3">
-              <button 
-                type="button"
-                onClick={handleCreateReservation}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center space-x-2"
-              >
-                <Plus className="h-4 w-4" />
-                <span>Nouvelle Réservation</span>
-              </button>
+              {mounted && (
+                <button 
+                  type="button"
+                  onClick={handleCreateReservation}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Nouvelle Réservation</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -466,15 +478,17 @@ export default function ReservationsPage() {
       </main>
 
       {/* Reservation Modal */}
-      <ReservationModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedReservation(undefined);
-        }}
-        reservation={selectedReservation}
-        onSave={handleSaveReservation}
-      />
+      {mounted && (
+        <ReservationModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedReservation(undefined);
+          }}
+          reservation={selectedReservation}
+          onSave={handleSaveReservation}
+        />
+      )}
     </div>
   );
 }
