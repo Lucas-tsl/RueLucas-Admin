@@ -1,135 +1,279 @@
-# Rue Lucas - Dashboard Admin
+# 🏨 RueLucas Admin Dashboard
 
-Dashboard administrateur pour la gestion des réservations et avis de la location de vacances Rue Lucas.
+> Interface d'administration moderne pour la gestion des réservations et avis de l'hôtel Rue Lucas
 
-## 🎯 Fonctionnalités
+[![Build Status](https://github.com/Lucas-tsl/RueLucas-Admin/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/Lucas-tsl/RueLucas-Admin/actions)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-### 📊 Gestion des Réservations
-- **Vue d'ensemble** : Statistiques en temps réel des réservations
-- **Liste paginée** : Affichage de toutes les réservations avec pagination
-- **Filtres avancés** : Recherche par nom, email, code de réservation et filtre par statut
-- **Actions** : Visualisation, modification et suppression des réservations
-- **Statuts** : Gestion des statuts (En attente, Payée, Annulée)
+## 📋 Table des matières
+
+- [✨ Fonctionnalités](#-fonctionnalités)
+- [🚀 Démarrage rapide](#-démarrage-rapide)
+- [🏗️ Architecture](#️-architecture)
+- [� API Integration](#-api-integration)
+- [🧪 Tests et CI/CD](#-tests-et-cicd)
+- [📝 Contributing](#-contributing)
+- [🌐 Déploiement](#-déploiement)
+
+## ✨ Fonctionnalités
+
+### 🏠 Dashboard Principal
+- **Vue d'ensemble** avec statistiques en temps réel
+- **Navigation intuitive** vers les modules de gestion
+- **Statut API** avec indicateur de santé
+
+### 📅 Gestion des Réservations
+- ✅ **CRUD complet** : Créer, lire, modifier, supprimer
+- 🔍 **Recherche avancée** par nom, email, code de réservation
+- 🏷️ **Filtrage par statut** : En attente, Payée, Annulée
+- 📊 **Pagination intelligente** avec affichage du total
+- 📱 **Interface responsive** optimisée mobile/desktop
+- 🎨 **Modals interactives** pour l'édition
+- ♿ **Accessibilité WCAG** avec labels et aria-labels
 
 ### ⭐ Gestion des Avis
-- **Liste complète** : Affichage de tous les avis clients
-- **Statistiques** : Note moyenne et répartition des notes
-- **Recherche** : Filtrage par auteur ou contenu de l'avis
-- **Visualisation** : Affichage avec système d'étoiles et dates
+- 📝 **Modération des avis** clients
+- ⭐ **Système de notation** sur 5 étoiles
+- 📈 **Statistiques détaillées** des évaluations
+- 🔍 **Recherche et filtrage** des commentaires
+- ✅ **Validation** des avis avant publication
 
-## 🚀 Technologies
+### 🤖 DevOps & Automation
+- � **GitHub Actions** pour CI/CD automatique
+- 🧪 **Tests automatiques** sur push/PR
+- 🔒 **Security audit** avec npm audit
+- 📊 **Build multi-environnements** (Node 18.x, 20.x)
+- 🚀 **Déploiement Vercel** automatique
 
-- **Next.js 15** (App Router)
-- **TypeScript** 
-- **Tailwind CSS**
-- **Lucide React** (icônes)
-- **API REST** : Connexion à https://api-rue-lucas.vercel.app
+## 🚀 Démarrage rapide
 
-## 📋 Prérequis
+### 📋 Prérequis
 
-- Node.js 18.0.0 ou plus récent
+- Node.js 18.x ou supérieur
 - npm ou yarn
+- Git
 
-## 🛠️ Installation
-
-1. **Cloner le projet**
-   ```bash
-   git clone [repository-url]
-   cd rue-lucas-dashboard
-   ```
-
-2. **Installer les dépendances**
-   ```bash
-   npm install
-   ```
-
-3. **Lancer le serveur de développement**
-   ```bash
-   npm run dev
-   ```
-
-4. **Ouvrir dans le navigateur**
-   ```
-   http://localhost:3000
-   ```
-
-## 🏗️ Scripts disponibles
+### 🛠️ Installation
 
 ```bash
-# Développement
-npm run dev          # Lance le serveur de développement
+# Cloner le repository
+git clone https://github.com/Lucas-tsl/RueLucas-Admin.git
+cd RueLucas-Admin
 
-# Production
-npm run build        # Compile l'application pour la production
-npm run start        # Lance l'application en mode production
+# Installer les dépendances
+npm install
 
-# Qualité de code
-npm run lint         # Vérifie la qualité du code avec ESLint
+# Lancer en mode développement
+npm run dev
 ```
 
-## 📱 Pages disponibles
+Ouvrez [http://localhost:3000](http://localhost:3000) pour voir l'application.
 
-### 🏠 Dashboard Principal (`/`)
-- Vue d'ensemble des statistiques
-- Navigation vers les sections
-- Status de l'API
+### 🔧 Scripts disponibles
 
-### 📅 Gestion des Réservations (`/reservations`)
-- Liste paginée des réservations
-- Filtres et recherche
-- Actions CRUD (à venir)
+```bash
+npm run dev          # Serveur de développement avec Turbopack
+npm run build        # Build de production
+npm run start        # Serveur de production
+npm run lint         # Linter ESLint
+npm run type-check   # Vérification TypeScript
+```
 
-### ⭐ Gestion des Avis (`/reviews`)
-- Liste des avis clients
-- Statistiques des notes
-- Recherche dans les avis
+## 🏗️ Architecture
 
-## 🔌 API
+### � Structure du projet
 
-L'application se connecte à l'API : `https://api-rue-lucas.vercel.app`
+```
+src/
+├── app/                    # App Router Next.js 15
+│   ├── page.tsx           # Dashboard principal
+│   ├── reservations/      # Module réservations
+│   │   └── page.tsx      # Interface CRUD réservations
+│   └── reviews/          # Module avis
+│       └── page.tsx      # Interface CRUD avis
+├── components/            # Composants réutilisables
+│   ├── ReservationModal.tsx # Modal d'édition réservations
+│   └── ReviewModal.tsx      # Modal d'édition avis
+├── types/                # Types TypeScript
+│   └── index.ts          # Types partagés API/Forms
+└── styles/               # Styles globaux
+    └── globals.css
+```
 
-### Endpoints utilisés :
-- `GET /reservations` - Liste des réservations avec pagination
-- `GET /api/reviews` - Liste des avis clients
-- `GET /health` - Status de l'API
+### 🎨 Stack technique
 
-## 🎨 Design
+- **Frontend** : Next.js 15, React 18, TypeScript
+- **Styling** : Tailwind CSS, Lucide React Icons
+- **State Management** : React Hooks (useState, useEffect, useCallback)
+- **Build** : Turbopack (Next.js 15)
+- **Linting** : ESLint, Prettier
+- **CI/CD** : GitHub Actions
+- **Deployment** : Vercel
 
-- **Design responsive** : Compatible mobile et desktop
-- **Interface moderne** : Design épuré avec Tailwind CSS
-- **UX intuitive** : Navigation claire et actions évidentes
-- **Accessibilité** : Respect des standards d'accessibilité web
+## � API Integration
 
-## 🚧 Fonctionnalités à venir
+### 🌐 Endpoints utilisés
 
-- [ ] Création/modification de réservations
-- [ ] Suppression de réservations
-- [ ] Modération des avis
-- [ ] Authentification admin
-- [ ] Notifications push
-- [ ] Export de données
-- [ ] Tableau de bord avancé
+```typescript
+// Base URL
+const API_BASE = 'https://api-rue-lucas.vercel.app'
 
-## 📈 Performance
+// Réservations
+GET    /reservations?page=1&limit=10&search=&status=
+POST   /reservations
+PUT    /reservations/:id
+DELETE /reservations/:id
 
-- **Build optimisé** : Static generation avec Next.js
-- **Chargement rapide** : Code splitting automatique
-- **SEO optimisé** : Meta tags et structure sémantique
+// Avis
+GET    /reviews?page=1&limit=10&search=&status=
+POST   /reviews
+PUT    /reviews/:id
+DELETE /reviews/:id
+```
 
-## 🔧 Configuration
+### 📊 Types de données
 
-### Variables d'environnement (optionnel)
-```env
+```typescript
+// Réservation API
+interface ApiReservation {
+  _id: string;
+  code: string;
+  status: 'pending' | 'paid' | 'cancelled';
+  firstName: string;
+  surname: string;
+  email: string;
+  startDate: string;
+  endDate: string;
+  amountTotal: number;
+  // ... autres champs
+}
+
+// Avis API
+interface ApiReview {
+  _id: string;
+  customerName: string;
+  hotelName: string;
+  rating: number;
+  comment: string;
+  status: 'pending' | 'approved' | 'rejected';
+  // ... autres champs
+}
+```
+
+## 🧪 Tests et CI/CD
+
+### 🔄 GitHub Actions
+
+Le projet utilise deux workflows principaux :
+
+#### 1. **CI/CD Pipeline** (`.github/workflows/ci.yml`)
+- ✅ Tests sur Node.js 18.x et 20.x
+- 🔍 Linting automatique
+- 🏗️ Build de production
+- 📦 Upload des artifacts
+
+#### 2. **PR Auto-Review** (`.github/workflows/pr-review.yml`)
+- 🔒 Security audit avec `npm audit`
+- 💅 Vérification du formatage code
+- 🤖 Commentaires automatiques sur les PR
+
+### 🎯 Workflow de développement
+
+```bash
+# 1. Créer une branche feature depuis dev
+git checkout dev
+git pull origin dev
+git checkout -b feature/nouvelle-fonctionnalite
+
+# 2. Développer et tester
+npm run dev
+npm run build
+npm run lint
+
+# 3. Commit avec message conventionnel
+git add .
+git commit -m "✨ feat: Ajouter nouvelle fonctionnalité"
+
+# 4. Push et créer une PR
+git push -u origin feature/nouvelle-fonctionnalite
+# Puis créer la PR sur GitHub
+```
+
+## 📝 Contributing
+
+### 🤝 Comment contribuer
+
+1. **Fork** le repository
+2. **Créer** une branche feature (`git checkout -b feature/amazing-feature`)
+3. **Commit** vos changements (`git commit -m '✨ feat: Add amazing feature'`)
+4. **Push** vers la branche (`git push origin feature/amazing-feature`)
+5. **Ouvrir** une Pull Request
+
+### 📋 Conventions
+
+#### 📝 Messages de commit
+
+Utiliser les [Conventional Commits](https://www.conventionalcommits.org/) :
+
+```
+✨ feat: Nouvelle fonctionnalité
+🐛 fix: Correction de bug
+📝 docs: Documentation
+🎨 style: Formatage code
+♻️ refactor: Refactoring
+🧪 test: Tests
+🔧 chore: Maintenance
+```
+
+#### � Code Review
+
+- Utiliser le template de PR fourni
+- Remplir la checklist complète
+- Ajouter des screenshots pour les changements visuels
+- S'assurer que les tests passent
+
+## 🌐 Déploiement
+
+### 🚀 Vercel (Automatique)
+
+Le déploiement se fait automatiquement via Vercel :
+
+- **Production** : Push sur `main` → Deploy sur [https://rue-lucas-admin.vercel.app](https://rue-lucas-admin.vercel.app)
+- **Preview** : PR vers `main` → Deploy preview automatique
+- **Development** : Branch `dev` → Deploy dev environment
+
+### 🔧 Variables d'environnement
+
+```bash
+# .env.local
 NEXT_PUBLIC_API_URL=https://api-rue-lucas.vercel.app
 ```
 
-### Configuration Next.js
-Le projet utilise la configuration par défaut de Next.js 15 avec :
-- App Router
-- TypeScript
-- Tailwind CSS
-- ESLint
+### 📊 Monitoring
+
+- **Build Status** : GitHub Actions badge
+- **Performance** : Vercel Analytics
+- **Errors** : Console logs et error boundaries
+
+## 🔗 Liens utiles
+
+- 🌐 **Application** : [https://rue-lucas-admin.vercel.app](https://rue-lucas-admin.vercel.app)
+- 📚 **API Documentation** : [https://api-rue-lucas.vercel.app/docs](https://api-rue-lucas.vercel.app/docs)
+- 🐛 **Issues** : [GitHub Issues](https://github.com/Lucas-tsl/RueLucas-Admin/issues)
+- 📝 **Discussions** : [GitHub Discussions](https://github.com/Lucas-tsl/RueLucas-Admin/discussions)
+
+## 📄 License
+
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ---
 
-**Développé par Lucas** - Dashboard pour la gestion de la location Rue Lucas
+<div align="center">
+
+**Fait avec ❤️ par [Lucas](https://github.com/Lucas-tsl)**
+
+[⬆ Retour au top](#-ruelucas-admin-dashboard)
+
+</div>
