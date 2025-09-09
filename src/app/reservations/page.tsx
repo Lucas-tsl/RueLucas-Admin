@@ -152,10 +152,10 @@ export default function ReservationsPage() {
         console.log('=== MODIFICATION RÉSERVATION ===');
         console.log('Données modifiées:', reservationData);
         console.log('ID réservation:', selectedReservation._id);
-        console.log('URL PUT:', `https://api-rue-lucas.vercel.app/reservations/${selectedReservation._id}`);
+        console.log('URL PATCH:', `https://api-rue-lucas.vercel.app/reservations/${selectedReservation._id}`);
         
         response = await fetch(`https://api-rue-lucas.vercel.app/reservations/${selectedReservation._id}`, {
-          method: 'PUT',
+          method: 'PATCH',
           headers: {
             'Content-Type': 'application/json'
           },
@@ -232,6 +232,15 @@ export default function ReservationsPage() {
       currency: 'EUR'
     }).format(amount);
   };
+
+  if (!mounted) {
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Chargement...</p>
+      </div>
+    </div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
