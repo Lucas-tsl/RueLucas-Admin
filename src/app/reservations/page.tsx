@@ -112,6 +112,8 @@ export default function ReservationsPage() {
 
     try {
       setLoading(true);
+      console.log('URL DELETE:', `https://api-rue-lucas.vercel.app/reservations/${id}`);
+      
       const response = await fetch(`https://api-rue-lucas.vercel.app/reservations/${id}`, {
         method: 'DELETE',
         headers: {
@@ -125,7 +127,13 @@ export default function ReservationsPage() {
       } else {
         const errorText = await response.text();
         console.error('Erreur de suppression:', response.status, errorText);
-        alert(`Erreur lors de la suppression: ${response.status} - ${errorText}`);
+        
+        // Vérifier si c'est un problème d'API non implémentée
+        if (response.status === 404) {
+          alert('⚠️ Fonctionnalité non disponible\n\nL\'API ne supporte pas encore la suppression de réservations.\nSeule la consultation est disponible pour le moment.');
+        } else {
+          alert(`Erreur lors de la suppression: ${response.status} - ${errorText}`);
+        }
       }
     } catch (error) {
       console.error('Erreur réseau:', error);
@@ -144,6 +152,7 @@ export default function ReservationsPage() {
         console.log('=== MODIFICATION RÉSERVATION ===');
         console.log('Réservation originale:', selectedReservation);
         console.log('Nouvelles données:', reservationData);
+        console.log('URL PUT:', `https://api-rue-lucas.vercel.app/reservations/${selectedReservation._id}`);
         
         response = await fetch(`https://api-rue-lucas.vercel.app/reservations/${selectedReservation._id}`, {
           method: 'PUT',
@@ -156,6 +165,7 @@ export default function ReservationsPage() {
         // Création d'une nouvelle réservation
         console.log('=== CRÉATION RÉSERVATION ===');
         console.log('Nouvelles données:', reservationData);
+        console.log('URL POST:', 'https://api-rue-lucas.vercel.app/reservations');
         
         response = await fetch('https://api-rue-lucas.vercel.app/reservations', {
           method: 'POST',
@@ -183,7 +193,13 @@ export default function ReservationsPage() {
       } else {
         const errorText = await response.text();
         console.error('Erreur de sauvegarde:', response.status, errorText);
-        alert(`Erreur lors de la sauvegarde: ${response.status} - ${errorText}`);
+        
+        // Vérifier si c'est un problème d'API non implémentée
+        if (response.status === 404) {
+          alert('⚠️ Fonctionnalité non disponible\n\nL\'API ne supporte pas encore la création/modification de réservations.\nSeule la consultation est disponible pour le moment.');
+        } else {
+          alert(`Erreur lors de la sauvegarde: ${response.status} - ${errorText}`);
+        }
       }
     } catch (error) {
       console.error('Erreur réseau:', error);
