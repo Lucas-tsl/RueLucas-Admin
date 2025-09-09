@@ -1,17 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { 
   Calendar, 
   ArrowLeft, 
-  Search, 
-  Filter,
+  Search,
   Building2,
   Eye,
   Edit,
-  Trash2,
-  Plus
+  Trash2
 } from 'lucide-react';
 
 interface Reservation {
@@ -51,7 +49,7 @@ export default function ReservationsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
 
-  const fetchReservations = async () => {
+  const fetchReservations = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
@@ -75,11 +73,11 @@ export default function ReservationsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, search, statusFilter]);
 
   useEffect(() => {
     fetchReservations();
-  }, [currentPage, search, statusFilter]);
+  }, [fetchReservations]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

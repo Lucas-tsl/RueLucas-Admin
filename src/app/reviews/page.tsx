@@ -7,7 +7,6 @@ import {
   ArrowLeft, 
   Search,
   Building2,
-  StarHalf,
   Calendar
 } from 'lucide-react';
 
