@@ -1,35 +1,60 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   Star, 
   ArrowLeft, 
   Search,
   Building2,
-  Calendar
+  Calendar,
+  Eye,
+  Edit,
+  Trash2,
+  Plus
 } from 'lucide-react';
-
-interface Review {
-  _id: string;
-  author: string;
-  rating: number;
-  comment: string;
-  date: string;
-}
+import ReviewModal from '../../components/ReviewModal';
+import { ApiReview, PaginatedResponse, ReviewForm } from '../../types';
 
 export default function ReviewsPage() {
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const router = useRouter();
+  const [reviews, setReviews] = useState<ApiReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState<ApiReview | undefined>();
 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch('https://api-rue-lucas.vercel.app/api/reviews');
-      const data: Review[] = await response.json();
-      setReviews(data);
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: '10'
+      });
+      
+      if (search) params.append('search', search);
+
+      const response = await fetch(`https://api-rue-lucas.vercel.app/api/reviews?${params}`);
+      const data: ApiReview[] = await response.json();
+      
+      // Si la réponse est un array simple, on adapte
+      if (Array.isArray(data)) {
+        setReviews(data);
+        setTotal(data.length);
+        setTotalPages(1);
+      } else {
+        // Si c'est un objet avec pagination
+        const paginatedData = data as PaginatedResponse<ApiReview>;
+        setReviews(paginatedData.items || []);
+        setTotal(paginatedData.total || 0);
+        setTotalPages(paginatedData.pages || 1);
+      }
+      
       setError('');
     } catch (err) {
       setError('Erreur lors du chargement des avis');
@@ -37,11 +62,108 @@ export default function ReviewsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, search]);
 
   useEffect(() => {
     fetchReviews();
-  }, []);
+  }, [fetchReviews]);
+
+  const handleCreateReview = () => {
+    setSelectedReview(undefined);
+    setIsModalOpen(true);
+  };
+
+  const handleEditReview = (review: ApiReview) => {
+    setSelectedReview(review);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteReview = async (id: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cet avis ?')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(`https://api-rue-lucas.vercel.app/api/reviews/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (response.ok) {
+        await fetchReviews();
+        alert('Avis supprimé avec succès');
+      } else {
+        const errorText = await response.text();
+        console.error('Erreur de suppression:', response.status, errorText);
+        alert(`Erreur lors de la suppression: ${response.status} - ${errorText}`);
+      }
+    } catch (error) {
+      console.error('Erreur réseau:', error);
+      alert(`Erreur réseau lors de la suppression: ${error}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveReview = async (reviewData: Partial<ReviewForm>) => {
+    try {
+      let response;
+      
+      if (selectedReview) {
+        // Modification d'un avis existant
+        console.log('=== MODIFICATION AVIS ===');
+        console.log('Avis original:', selectedReview);
+        console.log('Nouvelles données:', reviewData);
+        console.log('URL:', `https://api-rue-lucas.vercel.app/api/reviews/${selectedReview._id}`);
+        
+        response = await fetch(`https://api-rue-lucas.vercel.app/api/reviews/${selectedReview._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(reviewData)
+        });
+      } else {
+        // Création d'un nouvel avis
+        console.log('Création d\'un nouvel avis:', reviewData);
+        response = await fetch('https://api-rue-lucas.vercel.app/api/reviews', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(reviewData)
+        });
+      }
+
+      console.log('Réponse API:', response.status, response.statusText);
+
+      if (response.ok) {
+        // Fermer le modal IMMÉDIATEMENT
+        setIsModalOpen(false);
+        setSelectedReview(undefined);
+        
+        // Afficher le message de succès
+        const message = selectedReview ? 'Avis modifié avec succès !' : 'Avis créé avec succès !';
+        alert(message);
+        
+        // Recharger les avis
+        await fetchReviews();
+        
+      } else {
+        const errorText = await response.text();
+        console.error('Erreur de sauvegarde:', response.status, errorText);
+        alert(`Erreur lors de la sauvegarde: ${response.status} - ${errorText}`);
+      }
+    } catch (error) {
+      console.error('Erreur réseau:', error);
+      alert(`Erreur réseau lors de la sauvegarde: ${error}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredReviews = reviews.filter(review =>
     review.author.toLowerCase().includes(search.toLowerCase()) ||
@@ -106,12 +228,25 @@ export default function ReviewsPage() {
                 Gestion des Avis
               </h1>
             </div>
+            <div className="flex space-x-3">
+              <button 
+                onClick={() => {
+                  setSelectedReview(undefined);
+                  setIsModalOpen(true);
+                }}
+                className="bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-yellow-700 transition-colors flex items-center space-x-2"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Nouvel Avis</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
@@ -169,27 +304,28 @@ export default function ReviewsPage() {
         <div className="bg-white rounded-lg shadow mb-6 p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Répartition des notes</h3>
           <div className="space-y-3">
-            {[5, 4, 3, 2, 1].map((rating) => (
-              <div key={rating} className="flex items-center">
-                <div className="flex items-center w-12">
-                  <span className="text-sm font-medium text-gray-700">{rating}</span>
-                  <Star className="h-4 w-4 text-yellow-400 ml-1 fill-current" />
-                </div>
-                <div className="flex-1 mx-4">
-                  <div className="bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-yellow-400 h-2 rounded-full"
-                      style={{
-                        width: `${reviews.length > 0 ? (ratingCounts[rating as keyof typeof ratingCounts] / reviews.length) * 100 : 0}%`
-                      }}
-                    ></div>
+            {[5, 4, 3, 2, 1].map((rating) => {
+              const percentage = reviews.length > 0 ? (ratingCounts[rating as keyof typeof ratingCounts] / reviews.length) * 100 : 0;
+              return (
+                <div key={rating} className="flex items-center">
+                  <div className="flex items-center w-12">
+                    <span className="text-sm font-medium text-gray-700">{rating}</span>
+                    <Star className="h-4 w-4 text-yellow-400 ml-1 fill-current" />
                   </div>
+                  <div className="flex-1 mx-4">
+                    <div className="bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${percentage}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  <span className="text-sm text-gray-600 w-12 text-right">
+                    {ratingCounts[rating as keyof typeof ratingCounts]}
+                  </span>
                 </div>
-                <span className="text-sm text-gray-600 w-12 text-right">
-                  {ratingCounts[rating as keyof typeof ratingCounts]}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -255,6 +391,22 @@ export default function ReviewsPage() {
                         {formatDate(review.date)}
                       </div>
                     </div>
+                    <div className="flex space-x-2 ml-4">
+                      <button 
+                        onClick={() => handleEditReview(review)}
+                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Modifier l'avis"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteReview(review._id)}
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Supprimer l'avis"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -262,6 +414,17 @@ export default function ReviewsPage() {
           )}
         </div>
       </main>
+
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedReview(undefined);
+        }}
+        review={selectedReview}
+        onSave={handleSaveReview}
+      />
     </div>
   );
 }
