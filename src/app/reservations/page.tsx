@@ -200,10 +200,13 @@ export default function ReservationsPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR');
+    if (!dateString) return 'Date non définie';
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? 'Date invalide' : date.toLocaleDateString('fr-FR');
   };
 
   const formatCurrency = (amount: number) => {
+    if (typeof amount !== 'number' || isNaN(amount)) return '0,00 €';
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'EUR'
@@ -227,6 +230,7 @@ export default function ReservationsPage() {
             </div>
             <div className="flex space-x-3">
               <button 
+                type="button"
                 onClick={handleCreateReservation}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center space-x-2"
               >
