@@ -1,36 +1,135 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Rue Lucas - Dashboard Admin
 
-## Getting Started
+Dashboard administrateur pour la gestion des réservations et avis de la location de vacances Rue Lucas.
 
-First, run the development server:
+## 🎯 Fonctionnalités
+
+### 📊 Gestion des Réservations
+- **Vue d'ensemble** : Statistiques en temps réel des réservations
+- **Liste paginée** : Affichage de toutes les réservations avec pagination
+- **Filtres avancés** : Recherche par nom, email, code de réservation et filtre par statut
+- **Actions** : Visualisation, modification et suppression des réservations
+- **Statuts** : Gestion des statuts (En attente, Payée, Annulée)
+
+### ⭐ Gestion des Avis
+- **Liste complète** : Affichage de tous les avis clients
+- **Statistiques** : Note moyenne et répartition des notes
+- **Recherche** : Filtrage par auteur ou contenu de l'avis
+- **Visualisation** : Affichage avec système d'étoiles et dates
+
+## 🚀 Technologies
+
+- **Next.js 15** (App Router)
+- **TypeScript** 
+- **Tailwind CSS**
+- **Lucide React** (icônes)
+- **API REST** : Connexion à https://api-rue-lucas.vercel.app
+
+## 📋 Prérequis
+
+- Node.js 18.0.0 ou plus récent
+- npm ou yarn
+
+## 🛠️ Installation
+
+1. **Cloner le projet**
+   ```bash
+   git clone [repository-url]
+   cd rue-lucas-dashboard
+   ```
+
+2. **Installer les dépendances**
+   ```bash
+   npm install
+   ```
+
+3. **Lancer le serveur de développement**
+   ```bash
+   npm run dev
+   ```
+
+4. **Ouvrir dans le navigateur**
+   ```
+   http://localhost:3000
+   ```
+
+## 🏗️ Scripts disponibles
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Développement
+npm run dev          # Lance le serveur de développement
+
+# Production
+npm run build        # Compile l'application pour la production
+npm run start        # Lance l'application en mode production
+
+# Qualité de code
+npm run lint         # Vérifie la qualité du code avec ESLint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📱 Pages disponibles
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 🏠 Dashboard Principal (`/`)
+- Vue d'ensemble des statistiques
+- Navigation vers les sections
+- Status de l'API
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 📅 Gestion des Réservations (`/reservations`)
+- Liste paginée des réservations
+- Filtres et recherche
+- Actions CRUD (à venir)
 
-## Learn More
+### ⭐ Gestion des Avis (`/reviews`)
+- Liste des avis clients
+- Statistiques des notes
+- Recherche dans les avis
 
-To learn more about Next.js, take a look at the following resources:
+## 🔌 API
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+L'application se connecte à l'API : `https://api-rue-lucas.vercel.app`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Endpoints utilisés :
+- `GET /reservations` - Liste des réservations avec pagination
+- `GET /api/reviews` - Liste des avis clients
+- `GET /health` - Status de l'API
 
-## Deploy on Vercel
+## 🎨 Design
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Design responsive** : Compatible mobile et desktop
+- **Interface moderne** : Design épuré avec Tailwind CSS
+- **UX intuitive** : Navigation claire et actions évidentes
+- **Accessibilité** : Respect des standards d'accessibilité web
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🚧 Fonctionnalités à venir
+
+- [ ] Création/modification de réservations
+- [ ] Suppression de réservations
+- [ ] Modération des avis
+- [ ] Authentification admin
+- [ ] Notifications push
+- [ ] Export de données
+- [ ] Tableau de bord avancé
+
+## 📈 Performance
+
+- **Build optimisé** : Static generation avec Next.js
+- **Chargement rapide** : Code splitting automatique
+- **SEO optimisé** : Meta tags et structure sémantique
+
+## 🔧 Configuration
+
+### Variables d'environnement (optionnel)
+```env
+NEXT_PUBLIC_API_URL=https://api-rue-lucas.vercel.app
+```
+
+### Configuration Next.js
+Le projet utilise la configuration par défaut de Next.js 15 avec :
+- App Router
+- TypeScript
+- Tailwind CSS
+- ESLint
+
+---
+
+**Développé par Lucas** - Dashboard pour la gestion de la location Rue Lucas
