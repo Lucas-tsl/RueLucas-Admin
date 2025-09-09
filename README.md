@@ -1,11 +1,86 @@
 # 🏨 RueLucas Admin Dashboard
 
-> Interface d'administration moderne pour la gestion des réservations et avis de l'hôtel Rue Lucas
+> Interface d'administration pour la gestion des réservations et avis de l'hôtel Rue Lucas
 
-[![Build Status](https://github.com/Lucas-tsl/RueLucas-Admin/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/Lucas-tsl/RueLucas-Admin/actions)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+
+## ✨ Fonctionnalités
+
+- 📅 **Gestion des Réservations** : CRUD complet avec recherche et filtres
+- ⭐ **Gestion des Avis** : Modération et statistiques des avis clients
+- 📊 **Dashboard** : Vue d'ensemble avec statistiques temps réel
+- 🔄 **CI/CD** : GitHub Actions avec déploiement automatique
+
+## 🚀 Installation
+
+```bash
+# Cloner et installer
+git clone https://github.com/Lucas-tsl/RueLucas-Admin.git
+cd RueLucas-Admin
+npm install
+
+# Démarrer en développement
+npm run dev
+```
+
+Ouvrir [http://localhost:3000](http://localhost:3000)
+
+## 🛠️ Scripts
+
+```bash
+npm run dev      # Développement
+npm run build    # Build production
+npm run lint     # Linter ESLint
+```
+
+## 🏗️ Architecture
+
+```
+src/
+├── app/
+│   ├── page.tsx              # Dashboard
+│   ├── reservations/         # Module réservations
+│   └── reviews/              # Module avis
+├── components/               # Composants réutilisables
+├── types/                    # Types TypeScript
+└── .github/workflows/        # CI/CD
+```
+
+**Stack** : Next.js 15, TypeScript, Tailwind CSS, Vercel
+
+## 🔧 API
+
+Base URL : `https://api-rue-lucas.vercel.app`
+
+```typescript
+// Endpoints principaux
+GET /reservations?page=1&limit=10&search=&status=
+GET /reviews?page=1&limit=10&search=&status=
+POST|PUT|DELETE /reservations/:id
+POST|PUT|DELETE /reviews/:id
+```
+
+## 📝 Contribution
+
+1. Fork le repository
+2. Créer une branche : `git checkout -b feature/ma-feature`
+3. Commit : `git commit -m "✨ feat: Ma nouvelle feature"`
+4. Push : `git push origin feature/ma-feature`
+5. Ouvrir une Pull Request
+
+**Conventions** : [Conventional Commits](https://www.conventionalcommits.org/)
+
+## 🌐 Déploiement
+
+- **Production** : Push sur `main` → Auto-deploy Vercel
+- **Preview** : Pull Request → Preview automatique
+- **CI/CD** : GitHub Actions (tests, build, security audit)
+
+---
+
+**Fait avec ❤️ par [Lucas](https://github.com/Lucas-tsl)**
 
 ## 📋 Table des matières
 
