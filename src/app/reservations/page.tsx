@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   Calendar, 
   ArrowLeft, 
@@ -9,8 +10,10 @@ import {
   Building2,
   Eye,
   Edit,
-  Trash2
+  Trash2,
+  Plus
 } from 'lucide-react';
+import ReservationModal from '../../components/ReservationModal';
 
 interface Reservation {
   _id: string;
@@ -40,6 +43,7 @@ interface ApiResponse {
 }
 
 export default function ReservationsPage() {
+  const router = useRouter();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -48,6 +52,8 @@ export default function ReservationsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | undefined>();
 
   const fetchReservations = useCallback(async () => {
     try {
@@ -78,6 +84,104 @@ export default function ReservationsPage() {
   useEffect(() => {
     fetchReservations();
   }, [fetchReservations]);
+
+  const handleCreateReservation = () => {
+    setSelectedReservation(undefined);
+    setIsModalOpen(true);
+  };
+
+  const handleEditReservation = (reservation: Reservation) => {
+    setSelectedReservation(reservation);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteReservation = async (id: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(`https://api-rue-lucas.vercel.app/reservations/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (response.ok) {
+        await fetchReservations();
+        alert('Réservation supprimée avec succès');
+      } else {
+        const errorText = await response.text();
+        console.error('Erreur de suppression:', response.status, errorText);
+        alert(`Erreur lors de la suppression: ${response.status} - ${errorText}`);
+      }
+    } catch (error) {
+      console.error('Erreur réseau:', error);
+      alert(`Erreur réseau lors de la suppression: ${error}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveReservation = async (reservationData: any) => {
+    try {
+      let response;
+      
+      if (selectedReservation) {
+        // Modification d'une réservation existante
+        console.log('=== MODIFICATION RÉSERVATION ===');
+        console.log('Réservation originale:', selectedReservation);
+        console.log('Nouvelles données:', reservationData);
+        
+        response = await fetch(`https://api-rue-lucas.vercel.app/reservations/${selectedReservation._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(reservationData)
+        });
+      } else {
+        // Création d'une nouvelle réservation
+        console.log('=== CRÉATION RÉSERVATION ===');
+        console.log('Nouvelles données:', reservationData);
+        
+        response = await fetch('https://api-rue-lucas.vercel.app/reservations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(reservationData)
+        });
+      }
+
+      console.log('Réponse API:', response.status, response.statusText);
+
+      if (response.ok) {
+        // Fermer le modal IMMÉDIATEMENT
+        setIsModalOpen(false);
+        setSelectedReservation(undefined);
+        
+        // Afficher le message de succès
+        const message = selectedReservation ? 'Réservation modifiée avec succès !' : 'Réservation créée avec succès !';
+        alert(message);
+        
+        // Recharger les réservations
+        await fetchReservations();
+        
+      } else {
+        const errorText = await response.text();
+        console.error('Erreur de sauvegarde:', response.status, errorText);
+        alert(`Erreur lors de la sauvegarde: ${response.status} - ${errorText}`);
+      }
+    } catch (error) {
+      console.error('Erreur réseau:', error);
+      alert(`Erreur réseau lors de la sauvegarde: ${error}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -120,6 +224,15 @@ export default function ReservationsPage() {
               <h1 className="ml-3 text-xl font-semibold text-gray-900">
                 Gestion des Réservations
               </h1>
+            </div>
+            <div className="flex space-x-3">
+              <button 
+                onClick={handleCreateReservation}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center space-x-2"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Nouvelle Réservation</span>
+              </button>
             </div>
           </div>
         </div>
@@ -286,21 +399,24 @@ export default function ReservationsPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-2">
                           <button 
-                            className="text-blue-600 hover:text-blue-900"
+                            onClick={() => alert('Fonctionnalité de visualisation à implémenter')}
+                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Voir les détails"
                             aria-label="Voir les détails de la réservation"
                           >
                             <Eye className="h-4 w-4" />
                           </button>
                           <button 
-                            className="text-gray-600 hover:text-gray-900"
+                            onClick={() => handleEditReservation(reservation)}
+                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Modifier"
                             aria-label="Modifier la réservation"
                           >
                             <Edit className="h-4 w-4" />
                           </button>
                           <button 
-                            className="text-red-600 hover:text-red-900"
+                            onClick={() => handleDeleteReservation(reservation._id)}
+                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="Supprimer"
                             aria-label="Supprimer la réservation"
                           >
@@ -344,6 +460,17 @@ export default function ReservationsPage() {
           )}
         </div>
       </main>
+
+      {/* Reservation Modal */}
+      <ReservationModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedReservation(undefined);
+        }}
+        reservation={selectedReservation}
+        onSave={handleSaveReservation}
+      />
     </div>
   );
 }
