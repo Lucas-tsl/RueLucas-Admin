@@ -1,35 +1,58 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { 
   Star, 
   ArrowLeft, 
   Search,
   Building2,
-  Calendar
+  Calendar,
+  Eye,
+  Edit,
+  Trash2,
+  Plus
 } from 'lucide-react';
-
-interface Review {
-  _id: string;
-  author: string;
-  rating: number;
-  comment: string;
-  date: string;
-}
+import ReviewModal from '../../components/ReviewModal';
+import { ApiReview, PaginatedResponse, ReviewForm } from '../../types';
 
 export default function ReviewsPage() {
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviews, setReviews] = useState<ApiReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState<ApiReview | undefined>();
 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch('https://api-rue-lucas.vercel.app/api/reviews');
-      const data: Review[] = await response.json();
-      setReviews(data);
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: '10'
+      });
+      
+      if (search) params.append('search', search);
+
+      const response = await fetch(`https://api-rue-lucas.vercel.app/api/reviews?${params}`);
+      const data: ApiReview[] = await response.json();
+      
+      // Si la réponse est un array simple, on adapte
+      if (Array.isArray(data)) {
+        setReviews(data);
+        setTotal(data.length);
+        setTotalPages(1);
+      } else {
+        // Si c'est un objet avec pagination
+        const paginatedData = data as PaginatedResponse<ApiReview>;
+        setReviews(paginatedData.items || []);
+        setTotal(paginatedData.total || 0);
+        setTotalPages(paginatedData.pages || 1);
+      }
+      
       setError('');
     } catch (err) {
       setError('Erreur lors du chargement des avis');
@@ -37,11 +60,92 @@ export default function ReviewsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, search]);
 
   useEffect(() => {
     fetchReviews();
-  }, []);
+  }, [fetchReviews]);
+
+  const handleCreateReview = () => {
+    setSelectedReview(undefined);
+    setIsModalOpen(true);
+  };
+
+  const handleEditReview = (review: ApiReview) => {
+    setSelectedReview(review);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteReview = async (id: string) => {
+    // Note: L'API ne supporte pas encore la suppression des avis
+    alert('⚠️ Fonctionnalité non disponible\n\nLa suppression des avis n\'est pas encore implémentée dans l\'API.\nContactez le développeur pour ajouter cette fonctionnalité.');
+    return;
+
+    // Code pour quand l'API sera mise à jour :
+    /*
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cet avis ?')) {
+      return;
+    }
+
+    try {
+      console.log('Tentative de suppression de l\'avis ID:', id);
+      const response = await fetch(`https://api-rue-lucas.vercel.app/api/reviews/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      console.log('Réponse de suppression:', response.status, response.statusText);
+
+      if (response.ok) {
+        console.log('Suppression réussie, rechargement des avis...');
+        await fetchReviews();
+        alert('Avis supprimé avec succès');
+      } else {
+        const errorText = await response.text();
+        console.error('Erreur de suppression:', response.status, errorText);
+        alert(`Erreur lors de la suppression: ${response.status} - ${errorText}`);
+      }
+    } catch (error) {
+      console.error('Erreur réseau:', error);
+      alert(`Erreur réseau lors de la suppression: ${error}`);
+    }
+    */
+  };
+
+  const handleSaveReview = async (reviewData: Partial<ReviewForm>) => {
+    try {
+      if (selectedReview) {
+        // Modification d'un avis existant - pas encore supporté par l'API
+        alert('⚠️ Fonctionnalité non disponible\n\nLa modification des avis n\'est pas encore implémentée dans l\'API.\nContactez le développeur pour ajouter cette fonctionnalité.');
+        return;
+      }
+
+      // Création d'un nouvel avis - supporté par l'API
+      const response = await fetch('https://api-rue-lucas.vercel.app/api/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(reviewData)
+      });
+
+      if (response.ok) {
+        await fetchReviews();
+        setIsModalOpen(false);
+        setSelectedReview(undefined);
+        alert('Avis créé avec succès !');
+      } else {
+        const errorText = await response.text();
+        console.error('Erreur de création:', response.status, errorText);
+        alert(`Erreur lors de la création: ${response.status} - ${errorText}`);
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert(`Erreur lors de la sauvegarde: ${error}`);
+    }
+  };
 
   const filteredReviews = reviews.filter(review =>
     review.author.toLowerCase().includes(search.toLowerCase()) ||
@@ -106,12 +210,44 @@ export default function ReviewsPage() {
                 Gestion des Avis
               </h1>
             </div>
+            <div className="flex space-x-3">
+              <button 
+                onClick={() => {
+                  setSelectedReview(undefined);
+                  setIsModalOpen(true);
+                }}
+                className="bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-yellow-700 transition-colors flex items-center space-x-2"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Nouvel Avis</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Info Banner */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-blue-800">État des fonctionnalités</h3>
+              <div className="mt-2 text-sm text-blue-700">
+                <p>
+                  ✅ <strong>Consultation</strong> et <strong>Création</strong> d'avis : Fonctionnelles<br/>
+                  ⚠️ <strong>Modification</strong> et <strong>Suppression</strong> : En attente de mise à jour de l'API
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
@@ -177,8 +313,9 @@ export default function ReviewsPage() {
                 </div>
                 <div className="flex-1 mx-4">
                   <div className="bg-gray-200 rounded-full h-2">
+                    {/* Dynamic width for progress bar */}
                     <div
-                      className="bg-yellow-400 h-2 rounded-full"
+                      className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
                       style={{
                         width: `${reviews.length > 0 ? (ratingCounts[rating as keyof typeof ratingCounts] / reviews.length) * 100 : 0}%`
                       }}
@@ -255,6 +392,26 @@ export default function ReviewsPage() {
                         {formatDate(review.date)}
                       </div>
                     </div>
+                    <div className="flex space-x-2 ml-4">
+                      <button 
+                        onClick={() => {
+                          alert('⚠️ Fonctionnalité non disponible\n\nLa modification des avis n\'est pas encore implémentée dans l\'API.\nContactez le développeur pour ajouter cette fonctionnalité.');
+                        }}
+                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors cursor-not-allowed"
+                        title="Modifier l'avis (fonctionnalité non disponible)"
+                        disabled
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteReview(review._id)}
+                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors cursor-not-allowed"
+                        title="Supprimer l'avis (fonctionnalité non disponible)"
+                        disabled
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -262,6 +419,17 @@ export default function ReviewsPage() {
           )}
         </div>
       </main>
+
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedReview(undefined);
+        }}
+        review={selectedReview}
+        onSave={handleSaveReview}
+      />
     </div>
   );
 }
