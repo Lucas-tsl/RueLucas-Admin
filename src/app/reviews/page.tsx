@@ -77,18 +77,12 @@ export default function ReviewsPage() {
   };
 
   const handleDeleteReview = async (id: string) => {
-    // Note: L'API ne supporte pas encore la suppression des avis
-    alert('⚠️ Fonctionnalité non disponible\n\nLa suppression des avis n\'est pas encore implémentée dans l\'API.\nContactez le développeur pour ajouter cette fonctionnalité.');
-    return;
-
-    // Code pour quand l'API sera mise à jour :
-    /*
     if (!confirm('Êtes-vous sûr de vouloir supprimer cet avis ?')) {
       return;
     }
 
     try {
-      console.log('Tentative de suppression de l\'avis ID:', id);
+      setLoading(true);
       const response = await fetch(`https://api-rue-lucas.vercel.app/api/reviews/${id}`, {
         method: 'DELETE',
         headers: {
@@ -96,10 +90,7 @@ export default function ReviewsPage() {
         }
       });
 
-      console.log('Réponse de suppression:', response.status, response.statusText);
-
       if (response.ok) {
-        console.log('Suppression réussie, rechargement des avis...');
         await fetchReviews();
         alert('Avis supprimé avec succès');
       } else {
@@ -110,40 +101,51 @@ export default function ReviewsPage() {
     } catch (error) {
       console.error('Erreur réseau:', error);
       alert(`Erreur réseau lors de la suppression: ${error}`);
+    } finally {
+      setLoading(false);
     }
-    */
   };
 
   const handleSaveReview = async (reviewData: Partial<ReviewForm>) => {
     try {
+      setLoading(true);
+      let response;
+      
       if (selectedReview) {
-        // Modification d'un avis existant - pas encore supporté par l'API
-        alert('⚠️ Fonctionnalité non disponible\n\nLa modification des avis n\'est pas encore implémentée dans l\'API.\nContactez le développeur pour ajouter cette fonctionnalité.');
-        return;
+        // Modification d'un avis existant
+        response = await fetch(`https://api-rue-lucas.vercel.app/api/reviews/${selectedReview._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(reviewData)
+        });
+      } else {
+        // Création d'un nouvel avis
+        response = await fetch('https://api-rue-lucas.vercel.app/api/reviews', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(reviewData)
+        });
       }
-
-      // Création d'un nouvel avis - supporté par l'API
-      const response = await fetch('https://api-rue-lucas.vercel.app/api/reviews', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(reviewData)
-      });
 
       if (response.ok) {
         await fetchReviews();
         setIsModalOpen(false);
         setSelectedReview(undefined);
-        alert('Avis créé avec succès !');
+        alert(selectedReview ? 'Avis modifié avec succès !' : 'Avis créé avec succès !');
       } else {
         const errorText = await response.text();
-        console.error('Erreur de création:', response.status, errorText);
-        alert(`Erreur lors de la création: ${response.status} - ${errorText}`);
+        console.error('Erreur de sauvegarde:', response.status, errorText);
+        alert(`Erreur lors de la sauvegarde: ${response.status} - ${errorText}`);
       }
     } catch (error) {
       console.error('Erreur:', error);
       alert(`Erreur lors de la sauvegarde: ${error}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -229,19 +231,18 @@ export default function ReviewsPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Info Banner */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
           <div className="flex items-start">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-blue-800">État des fonctionnalités</h3>
-              <div className="mt-2 text-sm text-blue-700">
+              <h3 className="text-sm font-medium text-green-800">CRUD complet disponible</h3>
+              <div className="mt-2 text-sm text-green-700">
                 <p>
-                  ✅ <strong>Consultation</strong> et <strong>Création</strong> d'avis : Fonctionnelles<br/>
-                  ⚠️ <strong>Modification</strong> et <strong>Suppression</strong> : En attente de mise à jour de l'API
+                  ✅ <strong>Consultation</strong>, <strong>Création</strong>, <strong>Modification</strong> et <strong>Suppression</strong> d'avis : Toutes les fonctionnalités sont opérationnelles
                 </p>
               </div>
             </div>
@@ -305,28 +306,28 @@ export default function ReviewsPage() {
         <div className="bg-white rounded-lg shadow mb-6 p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Répartition des notes</h3>
           <div className="space-y-3">
-            {[5, 4, 3, 2, 1].map((rating) => (
-              <div key={rating} className="flex items-center">
-                <div className="flex items-center w-12">
-                  <span className="text-sm font-medium text-gray-700">{rating}</span>
-                  <Star className="h-4 w-4 text-yellow-400 ml-1 fill-current" />
-                </div>
-                <div className="flex-1 mx-4">
-                  <div className="bg-gray-200 rounded-full h-2">
-                    {/* Dynamic width for progress bar */}
-                    <div
-                      className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
-                      style={{
-                        width: `${reviews.length > 0 ? (ratingCounts[rating as keyof typeof ratingCounts] / reviews.length) * 100 : 0}%`
-                      }}
-                    ></div>
+            {[5, 4, 3, 2, 1].map((rating) => {
+              const percentage = reviews.length > 0 ? (ratingCounts[rating as keyof typeof ratingCounts] / reviews.length) * 100 : 0;
+              return (
+                <div key={rating} className="flex items-center">
+                  <div className="flex items-center w-12">
+                    <span className="text-sm font-medium text-gray-700">{rating}</span>
+                    <Star className="h-4 w-4 text-yellow-400 ml-1 fill-current" />
                   </div>
+                  <div className="flex-1 mx-4">
+                    <div className="bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${percentage}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  <span className="text-sm text-gray-600 w-12 text-right">
+                    {ratingCounts[rating as keyof typeof ratingCounts]}
+                  </span>
                 </div>
-                <span className="text-sm text-gray-600 w-12 text-right">
-                  {ratingCounts[rating as keyof typeof ratingCounts]}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -394,20 +395,16 @@ export default function ReviewsPage() {
                     </div>
                     <div className="flex space-x-2 ml-4">
                       <button 
-                        onClick={() => {
-                          alert('⚠️ Fonctionnalité non disponible\n\nLa modification des avis n\'est pas encore implémentée dans l\'API.\nContactez le développeur pour ajouter cette fonctionnalité.');
-                        }}
-                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors cursor-not-allowed"
-                        title="Modifier l'avis (fonctionnalité non disponible)"
-                        disabled
+                        onClick={() => handleEditReview(review)}
+                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Modifier l'avis"
                       >
                         <Edit className="h-4 w-4" />
                       </button>
                       <button 
                         onClick={() => handleDeleteReview(review._id)}
-                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors cursor-not-allowed"
-                        title="Supprimer l'avis (fonctionnalité non disponible)"
-                        disabled
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Supprimer l'avis"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
