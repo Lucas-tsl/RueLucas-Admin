@@ -148,21 +148,13 @@ export default function ReservationsPage() {
       let response;
       
       if (selectedReservation) {
-        // Modification d'une réservation existante
-        console.log('=== MODIFICATION RÉSERVATION ===');
-        console.log('Réservation originale:', selectedReservation);
-        console.log('Nouvelles données:', reservationData);
-        console.log('URL PUT:', `https://api-rue-lucas.vercel.app/reservations/${selectedReservation._id}`);
-        
-        response = await fetch(`https://api-rue-lucas.vercel.app/reservations/${selectedReservation._id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(reservationData)
-        });
+        // Modification d'une réservation existante - pas supportée par l'API
+        alert('⚠️ Fonctionnalité non disponible\n\nLa modification des réservations n\'est pas encore implémentée dans l\'API.\nSeules la création et suppression sont disponibles.');
+        setIsModalOpen(false);
+        setSelectedReservation(undefined);
+        return;
       } else {
-        // Création d'une nouvelle réservation
+        // Création d'une nouvelle réservation - supportée
         console.log('=== CRÉATION RÉSERVATION ===');
         console.log('Nouvelles données:', reservationData);
         console.log('URL POST:', 'https://api-rue-lucas.vercel.app/reservations');
@@ -184,8 +176,7 @@ export default function ReservationsPage() {
         setSelectedReservation(undefined);
         
         // Afficher le message de succès
-        const message = selectedReservation ? 'Réservation modifiée avec succès !' : 'Réservation créée avec succès !';
-        alert(message);
+        alert('Réservation créée avec succès !');
         
         // Recharger les réservations
         await fetchReservations();
@@ -193,13 +184,7 @@ export default function ReservationsPage() {
       } else {
         const errorText = await response.text();
         console.error('Erreur de sauvegarde:', response.status, errorText);
-        
-        // Vérifier si c'est un problème d'API non implémentée
-        if (response.status === 404) {
-          alert('⚠️ Fonctionnalité non disponible\n\nL\'API ne supporte pas encore la création/modification de réservations.\nSeule la consultation est disponible pour le moment.');
-        } else {
-          alert(`Erreur lors de la sauvegarde: ${response.status} - ${errorText}`);
-        }
+        alert(`Erreur lors de la sauvegarde: ${response.status} - ${errorText}`);
       }
     } catch (error) {
       console.error('Erreur réseau:', error);
@@ -439,10 +424,13 @@ export default function ReservationsPage() {
                             <Eye className="h-4 w-4" />
                           </button>
                           <button 
-                            onClick={() => handleEditReservation(reservation)}
-                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Modifier"
-                            aria-label="Modifier la réservation"
+                            onClick={() => {
+                              alert('⚠️ Fonctionnalité non disponible\n\nLa modification des réservations n\'est pas encore implémentée dans l\'API.\nSeules la création et suppression sont disponibles.');
+                            }}
+                            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors cursor-not-allowed"
+                            title="Modifier (non disponible)"
+                            aria-label="Modifier la réservation (non disponible)"
+                            disabled
                           >
                             <Edit className="h-4 w-4" />
                           </button>
