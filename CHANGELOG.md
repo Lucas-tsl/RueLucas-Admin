@@ -5,6 +5,25 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [0.3.0] - 2025-09-09
+
+### ✨ Ajouté
+- **CRUD complet des avis** : Suppression et modification d'avis maintenant fonctionnels
+- **Confirmations de suppression** : Dialog de confirmation avant suppression
+- **Messages de succès** : Notifications utilisateur pour toutes les opérations
+- **Interface mise à jour** : Boutons d'action activés et colorés selon l'action
+- **Gestion d'erreurs améliorée** : Messages d'erreur détaillés pour le debugging
+
+### 🔧 Améliorations
+- **API Integration** : Support complet des endpoints PUT et DELETE
+- **UX/UI** : Boutons interactifs avec hover states appropriés
+- **Loading states** : Indicateurs de chargement pendant les opérations
+- **Feedback utilisateur** : Banner d'information actualisé
+
+### 🐛 Corrigé
+- Interface CRUD désormais complètement opérationnelle
+- Boutons de modification et suppression activés
+
 ## [0.2.0] - 2025-09-09
 
 ### ✨ Ajouté
@@ -16,9 +35,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 - **Templates GitHub** : Templates de PR et d'issues structurés
 - **Gestion d'erreurs** : Messages informatifs pour les limitations API
 
-### ⚠️ Limitations
-- Modification d'avis : Interface prête, en attente endpoint API `PUT /api/reviews/:id`
-- Suppression d'avis : Interface prête, en attente endpoint API `DELETE /api/reviews/:id`
+### ⚠️ Limitations (Résolues en v0.3.0)
+- ~~Modification d'avis : Interface prête, en attente endpoint API `PUT /api/reviews/:id`~~
+- ~~Suppression d'avis : Interface prête, en attente endpoint API `DELETE /api/reviews/:id`~~
 
 ### 🔧 Technique
 - Intégration avec API Rue Lucas (https://api-rue-lucas.vercel.app)
